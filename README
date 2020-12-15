@@ -9,7 +9,9 @@ xkl comes in two parts:
     1. xkl: the keylogger itself
     2. xkd: log format decoder
 
-xkl runs on the target's machine logging keys to a log file. Once the log file is extracted from the target machine it can be decoded to show the actual keypresses via `xkd`.
+xkl runs on the target's machine logging keys to a log file. Once the log file 
+is extracted from the target machine it can be decoded to show the actual 
+keypresses via `xkd`.
 
 Usage
 -----
@@ -17,14 +19,17 @@ To see this in action:
 
 	$ ./xkl
 
-This will show keypresses on stdout as a bunch of hex-encoded data. In real time we can pipe the output to the decoder to render it in a more human-readable format:
+This will show keypresses on stdout as a bunch of hex-encoded data. In real 
+time we can pipe the output to the decoder to render it in a more 
+human-readable format:
 
 	$ ./xkl | ./xkd
 	-----a
 	-----Backspace
 	---S-a
 
-Now the actual keys that are typed can be seen, prefixed with the modifier in the following format:
+Now the actual keys that are typed can be seen, prefixed with the modifier in 
+the following format:
 
 	-----a
 	S = super
@@ -44,4 +49,5 @@ After, the log file can be decoded in the same way:
 
 Relation to sxhkd
 -----------------
-A large portion of this code is from and/or based on the Simple X HotKey Daemon ([sxhkd](https://github.com/baskerville/sxhkd)).
+A large portion of this code is from and/or based on the Simple X HotKey Daemon 
+(sxhkd): https://github.com/baskerville/sxhkd.
