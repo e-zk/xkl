@@ -1,0 +1,47 @@
+xkl
+===
+X11 keylogger
+
+About
+-----
+xkl comes in two parts:
+
+    1. xkl: the keylogger itself
+    2. xkd: log format decoder
+
+xkl runs on the target's machine logging keys to a log file. Once the log file is extracted from the target machine it can be decoded to show the actual keypresses via `xkd`.
+
+Usage
+-----
+To see this in action:
+
+	$ ./xkl
+
+This will show keypresses on stdout as a bunch of hex-encoded data. In real time we can pipe the output to the decoder to render it in a more human-readable format:
+
+	$ ./xkl | ./xkd
+	-----a
+	-----Backspace
+	---S-a
+
+Now the actual keys that are typed can be seen, prefixed with the modifier in the following format:
+
+	-----a
+	S = super
+	 A = alt
+	  C = control
+	   S = shift
+
+In a more realistic usecase xkl will have it's output redirected to a file:
+
+	$ ./xkl > logfile.txt
+
+After, the log file can be decoded in the same way:
+
+	$ cat logfile.txt | ./xkd
+	$ # or
+	$ ./xkd < logfile.txt
+
+Relation to sxhkd
+-----------------
+A large portion of this code is from and/or based on the Simple X HotKey Daemon ([sxhkd](https://github.com/baskerville/sxhkd)).
