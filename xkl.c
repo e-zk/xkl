@@ -1,19 +1,12 @@
 #include <err.h>
-#include <xcb/xcb_event.h>
-#include <xcb/xcb_keysyms.h>
-#include <xcb/xcb.h>
 #include <stdio.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <sys/stat.h>
-#include <sys/select.h>
-#include <sys/types.h>
-#include <sys/time.h>
-#include <fcntl.h>
-#include <signal.h>
 #include <stdbool.h>
 #include <string.h>
+#include <xcb/xcb.h>
+#include <xcb/xcb_event.h>
+#include <xcb/xcb_keysyms.h>
 
 #include "xkl.h"
 #include "parse.h"
@@ -32,22 +25,11 @@ uint16_t scroll_lock;
 int
 main(void)
 {
-	bool running;
-
 	setup();
-
-	xcb_grab_key(dpy,
-	             0,
-	             root,
-	             XCB_MOD_MASK_ANY,
-	             XCB_GRAB_ANY,
-	             XCB_GRAB_MODE_SYNC,
-	             XCB_GRAB_MODE_SYNC
-	);
+	grab_all_keys();
 	xcb_flush(dpy);
 
-	running = true;
-
+	bool running = true;
 	while (running) {
 
 		xcb_generic_event_t *ev = xcb_wait_for_event(dpy);
@@ -79,8 +61,10 @@ main(void)
 			warn("the server closed the connection.\n");
 			running = false;
 		}
+
 	}
 	
+	ungrab_all_keys();
 	xcb_key_symbols_free(symbols);
 	xcb_disconnect(dpy);
 	return 0;
@@ -109,5 +93,56 @@ setup(void)
 	num_lock = modfield_from_keysym(0xff7f);
 	caps_lock = XCB_MOD_MASK_LOCK;
 	scroll_lock = modfield_from_keysym(0xff14);
+}
+
+void
+grab_keys(uint16_t modfield)
+{
+	xcb_generic_error_t *err = xcb_request_check(dpy,
+	    xcb_grab_key_checked(dpy,
+                0,
+	        root,
+	        modfield,
+	        XCB_GRAB_ANY,
+	        XCB_GRAB_MODE_ASYNC,
+	        XCB_GRAB_MODE_SYNC
+	    )
+	);
+	if (err != NULL) {
+		warn("error %u encountered.\n", err->error_code);
+	}
+	free(err);
+}
+
+void
+grab_all_keys(void)
+{
+
+	// TODO
+	
+	grab_keys(XCB_NONE);
+	grab_keys(XCB_MOD_MASK_SHIFT);
+
+	//if (num_lock != 0)
+	//	grab_keys(XCB_NONE | num_lock);
+	//if (caps_lock != 0)
+	//	grab_keys(XCB_NONE | caps_lock);
+	//if (scroll_lock != 0)
+	//	grab_keys(XCB_NONE | scroll_lock);
+	//if (num_lock != 0 && caps_lock != 0)
+	//	grab_keys(XCB_NONE | num_lock | caps_lock);
+	//if (caps_lock != 0 && scroll_lock != 0)
+	//	grab_keys(XCB_NONE | scroll_lock | caps_lock);
+	//if (num_lock != 0 && scroll_lock != 0)
+	//	grab_keys(XCB_NONE | scroll_lock | num_lock);
+	//if (num_lock != 0 && caps_lock != 0 && scroll_lock != 0)
+	//	grab_keys(XCB_NONE | scroll_lock | num_lock | caps_lock );
+}
+
+void
+ungrab_all_keys(void)
+{
+	xcb_ungrab_key(dpy, XCB_GRAB_ANY, root, XCB_BUTTON_MASK_ANY);
+	xcb_flush(dpy);
 }
 
