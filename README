@@ -11,7 +11,7 @@ xkl comes in two parts:
 
 xkl runs on the target's machine logging keys to a log file. Once the log file 
 is extracted from the target machine it can be decoded to show the actual 
-keypresses via `xkd`.
+keypresses via xkd.
 
 Usage
 -----
